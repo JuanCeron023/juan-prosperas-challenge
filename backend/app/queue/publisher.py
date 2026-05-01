@@ -6,8 +6,8 @@ Publishes job messages to the appropriate SQS queue based on priority.
 import json
 import logging
 
-from backend.app.config import settings
-from backend.app.queue.client import get_sqs_client
+from app.config import settings
+from app.queue.client import get_sqs_client
 
 logger = logging.getLogger(__name__)
 

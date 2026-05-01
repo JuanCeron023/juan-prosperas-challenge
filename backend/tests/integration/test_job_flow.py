@@ -12,14 +12,14 @@ import pytest
 from fastapi.testclient import TestClient
 from moto import mock_aws
 
-from backend.app.auth.service import create_access_token
-from backend.app.main import app
+from app.auth.service import create_access_token
+from app.main import app
 
 
 @pytest.fixture
 def auth_token():
     """Create a valid JWT token for testing."""
-    with patch("backend.app.auth.service.settings") as mock_settings:
+    with patch("app.auth.service.settings") as mock_settings:
         mock_settings.jwt_secret = "test-secret"
         mock_settings.jwt_expiration_minutes = 60
         token = create_access_token("user-integration-test", "testuser")
@@ -80,10 +80,10 @@ class TestFullJobLifecycle:
         dynamodb, sqs, standard_url, high_url = self._setup_aws_resources()
         table = dynamodb.Table("jobs")
 
-        with patch("backend.app.auth.service.settings") as mock_auth_settings, \
-             patch("backend.app.db.repository._get_jobs_table", return_value=table), \
-             patch("backend.app.queue.publisher.get_sqs_client", return_value=sqs), \
-             patch("backend.app.queue.publisher.settings") as mock_pub_settings:
+        with patch("app.auth.service.settings") as mock_auth_settings, \
+             patch("app.db.repository._get_jobs_table", return_value=table), \
+             patch("app.queue.publisher.get_sqs_client", return_value=sqs), \
+             patch("app.queue.publisher.settings") as mock_pub_settings:
 
             mock_auth_settings.jwt_secret = "test-secret"
             mock_auth_settings.jwt_expiration_minutes = 60
@@ -112,7 +112,7 @@ class TestFullJobLifecycle:
             job_id = job_data["job_id"]
 
             # Step 2: Verify job is PENDING
-            with patch("backend.app.auth.service.settings") as mock_auth2:
+            with patch("app.auth.service.settings") as mock_auth2:
                 mock_auth2.jwt_secret = "test-secret"
                 mock_auth2.jwt_expiration_minutes = 60
 
@@ -125,14 +125,14 @@ class TestFullJobLifecycle:
             assert response.json()["status"] == "PENDING"
 
             # Step 3: Simulate worker updating job to COMPLETED
-            from backend.app.db.repository import update_job_status
+            from app.db.repository import update_job_status
 
             update_job_status(
                 job_id, "COMPLETED", result_url="https://s3.example.com/report.csv"
             )
 
             # Step 4: Verify job is COMPLETED
-            with patch("backend.app.auth.service.settings") as mock_auth3:
+            with patch("app.auth.service.settings") as mock_auth3:
                 mock_auth3.jwt_secret = "test-secret"
                 mock_auth3.jwt_expiration_minutes = 60
 

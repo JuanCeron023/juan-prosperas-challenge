@@ -8,8 +8,8 @@ from datetime import datetime, timezone
 
 from boto3.dynamodb.conditions import Key
 
-from backend.app.config import settings
-from backend.app.db.client import get_dynamodb_table
+from app.config import settings
+from app.db.client import get_dynamodb_table
 
 
 def _get_users_table():

@@ -4,14 +4,14 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, status
 
-from backend.app.auth.middleware import get_current_user
-from backend.app.jobs.schemas import (
+from app.auth.middleware import get_current_user
+from app.jobs.schemas import (
     JobCreateRequest,
     JobCreateResponse,
     JobListResponse,
     JobResponse,
 )
-from backend.app.jobs.service import create_job, get_job, list_user_jobs
+from app.jobs.service import create_job, get_job, list_user_jobs
 
 router = APIRouter(prefix="/jobs", tags=["jobs"])
 

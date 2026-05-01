@@ -4,9 +4,9 @@ import uuid
 
 from fastapi import APIRouter, HTTPException, status
 
-from backend.app.auth.schemas import LoginRequest, RegisterRequest, TokenResponse
-from backend.app.auth.service import create_access_token, hash_password, verify_password
-from backend.app.db.user_repository import create_user, get_user_by_username
+from app.auth.schemas import LoginRequest, RegisterRequest, TokenResponse
+from app.auth.service import create_access_token, hash_password, verify_password
+from app.db.user_repository import create_user, get_user_by_username
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

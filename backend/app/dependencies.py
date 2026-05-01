@@ -3,8 +3,8 @@
 Provides shared clients for DynamoDB and SQS that can be overridden in tests.
 """
 
-from backend.app.db.client import get_dynamodb_resource
-from backend.app.queue.client import get_sqs_client
+from app.db.client import get_dynamodb_resource
+from app.queue.client import get_sqs_client
 
 
 def get_db():

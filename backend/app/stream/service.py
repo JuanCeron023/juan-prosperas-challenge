@@ -5,7 +5,7 @@ import json
 import logging
 from typing import AsyncGenerator
 
-from backend.app.db.repository import list_jobs_by_user
+from app.db.repository import list_jobs_by_user
 
 logger = logging.getLogger(__name__)
 

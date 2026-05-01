@@ -3,14 +3,14 @@
 import json
 from unittest.mock import MagicMock, patch
 
-from backend.app.queue.publisher import publish_job_message
+from app.queue.publisher import publish_job_message
 
 
 class TestPublishJobMessage:
     """Tests for publish_job_message function."""
 
-    @patch("backend.app.queue.publisher.get_sqs_client")
-    @patch("backend.app.queue.publisher.settings")
+    @patch("app.queue.publisher.get_sqs_client")
+    @patch("app.queue.publisher.settings")
     def test_publish_standard_priority(self, mock_settings, mock_get_client):
         """Standard priority messages are sent to the standard queue."""
         mock_settings.sqs_standard_queue_url = "http://localhost:4566/000000000000/reports-queue-standard"
@@ -33,8 +33,8 @@ class TestPublishJobMessage:
         call_kwargs = mock_sqs.send_message.call_args[1]
         assert call_kwargs["QueueUrl"] == "http://localhost:4566/000000000000/reports-queue-standard"
 
-    @patch("backend.app.queue.publisher.get_sqs_client")
-    @patch("backend.app.queue.publisher.settings")
+    @patch("app.queue.publisher.get_sqs_client")
+    @patch("app.queue.publisher.settings")
     def test_publish_high_priority(self, mock_settings, mock_get_client):
         """High priority messages are sent to the high priority queue."""
         mock_settings.sqs_standard_queue_url = "http://localhost:4566/000000000000/reports-queue-standard"
@@ -57,8 +57,8 @@ class TestPublishJobMessage:
         call_kwargs = mock_sqs.send_message.call_args[1]
         assert call_kwargs["QueueUrl"] == "http://localhost:4566/000000000000/reports-queue-high"
 
-    @patch("backend.app.queue.publisher.get_sqs_client")
-    @patch("backend.app.queue.publisher.settings")
+    @patch("app.queue.publisher.get_sqs_client")
+    @patch("app.queue.publisher.settings")
     def test_message_contains_all_fields(self, mock_settings, mock_get_client):
         """The published message body contains all required fields."""
         mock_settings.sqs_standard_queue_url = "http://localhost:4566/000000000000/reports-queue-standard"

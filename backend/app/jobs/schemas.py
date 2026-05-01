@@ -5,7 +5,7 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, model_validator
 
-from backend.app.jobs.enums import JobStatus
+from app.jobs.enums import JobStatus
 
 
 class DateRange(BaseModel):

@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from backend.app.db import user_repository
+from app.db import user_repository
 
 
 class TestCreateUser:

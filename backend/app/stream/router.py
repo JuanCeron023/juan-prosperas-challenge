@@ -5,8 +5,8 @@ import logging
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 
-from backend.app.auth.middleware import get_current_user
-from backend.app.stream.service import job_status_stream
+from app.auth.middleware import get_current_user
+from app.stream.service import job_status_stream
 
 router = APIRouter(prefix="/stream", tags=["stream"])
 logger = logging.getLogger(__name__)

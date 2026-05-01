@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 
-from backend.app.main import app
+from app.main import app
 
 
 @pytest.fixture
@@ -27,8 +27,8 @@ class TestHealthEndpoint:
         }
 
         with patch(
-            "backend.app.db.client.get_dynamodb_table", return_value=mock_table
-        ), patch("backend.app.queue.client.get_sqs_client", return_value=mock_sqs):
+            "app.db.client.get_dynamodb_table", return_value=mock_table
+        ), patch("app.queue.client.get_sqs_client", return_value=mock_sqs):
             response = client.get("/health")
 
         assert response.status_code == 200
@@ -46,9 +46,9 @@ class TestHealthEndpoint:
         }
 
         with patch(
-            "backend.app.db.client.get_dynamodb_table",
+            "app.db.client.get_dynamodb_table",
             side_effect=Exception("DynamoDB unreachable"),
-        ), patch("backend.app.queue.client.get_sqs_client", return_value=mock_sqs):
+        ), patch("app.queue.client.get_sqs_client", return_value=mock_sqs):
             response = client.get("/health")
 
         assert response.status_code == 503
@@ -66,8 +66,8 @@ class TestHealthEndpoint:
         mock_sqs.get_queue_attributes.side_effect = Exception("SQS unreachable")
 
         with patch(
-            "backend.app.db.client.get_dynamodb_table", return_value=mock_table
-        ), patch("backend.app.queue.client.get_sqs_client", return_value=mock_sqs):
+            "app.db.client.get_dynamodb_table", return_value=mock_table
+        ), patch("app.queue.client.get_sqs_client", return_value=mock_sqs):
             response = client.get("/health")
 
         assert response.status_code == 503
@@ -82,9 +82,9 @@ class TestHealthEndpoint:
         mock_sqs.get_queue_attributes.side_effect = Exception("SQS unreachable")
 
         with patch(
-            "backend.app.db.client.get_dynamodb_table",
+            "app.db.client.get_dynamodb_table",
             side_effect=Exception("DynamoDB unreachable"),
-        ), patch("backend.app.queue.client.get_sqs_client", return_value=mock_sqs):
+        ), patch("app.queue.client.get_sqs_client", return_value=mock_sqs):
             response = client.get("/health")
 
         assert response.status_code == 503
@@ -104,8 +104,8 @@ class TestHealthEndpoint:
         }
 
         with patch(
-            "backend.app.db.client.get_dynamodb_table", return_value=mock_table
-        ), patch("backend.app.queue.client.get_sqs_client", return_value=mock_sqs):
+            "app.db.client.get_dynamodb_table", return_value=mock_table
+        ), patch("app.queue.client.get_sqs_client", return_value=mock_sqs):
             response = client.get("/health")
 
         body = response.json()
@@ -127,8 +127,8 @@ class TestHealthEndpoint:
         }
 
         with patch(
-            "backend.app.db.client.get_dynamodb_table", return_value=mock_table
-        ), patch("backend.app.queue.client.get_sqs_client", return_value=mock_sqs):
+            "app.db.client.get_dynamodb_table", return_value=mock_table
+        ), patch("app.queue.client.get_sqs_client", return_value=mock_sqs):
             # No Authorization header
             response = client.get("/health")
 

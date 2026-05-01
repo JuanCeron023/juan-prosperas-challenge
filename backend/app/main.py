@@ -6,10 +6,10 @@ Registers routers, exception handlers, and CORS middleware.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.app.auth.router import router as auth_router
-from backend.app.jobs.router import router as jobs_router
-from backend.app.stream.router import router as stream_router
-from backend.app.errors.handlers import register_exception_handlers
+from app.auth.router import router as auth_router
+from app.jobs.router import router as jobs_router
+from app.stream.router import router as stream_router
+from app.errors.handlers import register_exception_handlers
 
 app = FastAPI(
     title="Async Report Processing API",
@@ -44,10 +44,10 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint that verifies DynamoDB and SQS connectivity."""
-    from backend.app.db.client import get_dynamodb_table
-    from backend.app.queue.client import get_sqs_client
-    from backend.app.config import settings
-    from backend.app.observability.metrics import metrics
+    from app.db.client import get_dynamodb_table
+    from app.queue.client import get_sqs_client
+    from app.config import settings
+    from app.observability.metrics import metrics
     from fastapi.responses import JSONResponse
 
     dynamodb_status = "ok"

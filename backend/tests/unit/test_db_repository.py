@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 from moto import mock_aws
 
-from backend.app.db.repository import (
+from app.db.repository import (
     create_job,
     get_job,
     list_jobs_by_user,
@@ -18,7 +18,7 @@ from backend.app.db.repository import (
 def mock_table(dynamodb_resource):
     """Patch the repository to use the mocked DynamoDB table."""
     table = dynamodb_resource.Table("jobs")
-    with patch("backend.app.db.repository._get_jobs_table", return_value=table):
+    with patch("app.db.repository._get_jobs_table", return_value=table):
         yield table
 
 

@@ -5,7 +5,7 @@ from datetime import date
 import pytest
 from pydantic import ValidationError
 
-from backend.app.jobs.schemas import DateRange, JobCreateRequest
+from app.jobs.schemas import DateRange, JobCreateRequest
 
 
 class TestJobCreateRequest:

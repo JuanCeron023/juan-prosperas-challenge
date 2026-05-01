@@ -10,8 +10,8 @@ import pytest
 from fastapi.testclient import TestClient
 from moto import mock_aws
 
-from backend.app.auth.service import create_access_token
-from backend.app.main import app
+from app.auth.service import create_access_token
+from app.main import app
 
 
 @pytest.fixture
@@ -61,10 +61,10 @@ class TestSQSUnavailable:
         mock_sqs = MagicMock()
         mock_sqs.send_message.side_effect = Exception("SQS service unavailable")
 
-        with patch("backend.app.auth.service.settings") as mock_auth_settings, \
-             patch("backend.app.db.repository._get_jobs_table", return_value=table), \
-             patch("backend.app.queue.publisher.get_sqs_client", return_value=mock_sqs), \
-             patch("backend.app.queue.publisher.settings") as mock_pub_settings:
+        with patch("app.auth.service.settings") as mock_auth_settings, \
+             patch("app.db.repository._get_jobs_table", return_value=table), \
+             patch("app.queue.publisher.get_sqs_client", return_value=mock_sqs), \
+             patch("app.queue.publisher.settings") as mock_pub_settings:
 
             mock_auth_settings.jwt_secret = "test-secret"
             mock_auth_settings.jwt_expiration_minutes = 60
@@ -103,8 +103,8 @@ class TestDynamoDBUnavailable:
         mock_table = MagicMock()
         mock_table.put_item.side_effect = Exception("DynamoDB service unavailable")
 
-        with patch("backend.app.auth.service.settings") as mock_auth_settings, \
-             patch("backend.app.db.repository._get_jobs_table", return_value=mock_table):
+        with patch("app.auth.service.settings") as mock_auth_settings, \
+             patch("app.db.repository._get_jobs_table", return_value=mock_table):
 
             mock_auth_settings.jwt_secret = "test-secret"
             mock_auth_settings.jwt_expiration_minutes = 60

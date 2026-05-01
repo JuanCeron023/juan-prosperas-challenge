@@ -7,7 +7,7 @@ LocalStack (local development) and real AWS (production).
 import boto3
 from functools import lru_cache
 
-from backend.app.config import settings
+from app.config import settings
 
 
 @lru_cache(maxsize=1)

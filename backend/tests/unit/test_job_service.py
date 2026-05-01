@@ -6,14 +6,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi import HTTPException
 
-from backend.app.jobs.service import create_job, get_job, list_user_jobs
+from app.jobs.service import create_job, get_job, list_user_jobs
 
 
 class TestCreateJob:
     """Tests for create_job function."""
 
-    @patch("backend.app.jobs.service.publish_job_message")
-    @patch("backend.app.jobs.service.db_create_job")
+    @patch("app.jobs.service.publish_job_message")
+    @patch("app.jobs.service.db_create_job")
     def test_create_job_returns_pending(self, mock_db_create, mock_publish):
         """create_job returns a dict with job_id and status PENDING."""
         mock_db_create.return_value = {"job_id": "test-id", "status": "PENDING"}
@@ -29,8 +29,8 @@ class TestCreateJob:
         assert result["status"] == "PENDING"
         assert "job_id" in result
 
-    @patch("backend.app.jobs.service.publish_job_message")
-    @patch("backend.app.jobs.service.db_create_job")
+    @patch("app.jobs.service.publish_job_message")
+    @patch("app.jobs.service.db_create_job")
     def test_create_job_publishes_to_sqs(self, mock_db_create, mock_publish):
         """create_job calls publish_job_message with correct parameters."""
         mock_db_create.return_value = {"job_id": "test-id", "status": "PENDING"}
@@ -50,9 +50,9 @@ class TestCreateJob:
         assert call_kwargs["format"] == "pdf"
         assert call_kwargs["priority"] == "high"
 
-    @patch("backend.app.jobs.service.update_job_status")
-    @patch("backend.app.jobs.service.publish_job_message")
-    @patch("backend.app.jobs.service.db_create_job")
+    @patch("app.jobs.service.update_job_status")
+    @patch("app.jobs.service.publish_job_message")
+    @patch("app.jobs.service.db_create_job")
     def test_create_job_sqs_failure_marks_failed(
         self, mock_db_create, mock_publish, mock_update
     ):
@@ -77,7 +77,7 @@ class TestCreateJob:
 class TestGetJob:
     """Tests for get_job function."""
 
-    @patch("backend.app.jobs.service.db_get_job")
+    @patch("app.jobs.service.db_get_job")
     def test_get_job_returns_job_for_owner(self, mock_db_get):
         """get_job returns the job when the requesting user is the owner."""
         mock_db_get.return_value = {
@@ -94,7 +94,7 @@ class TestGetJob:
         assert result["job_id"] == "job-1"
         assert result["user_id"] == "user-123"
 
-    @patch("backend.app.jobs.service.db_get_job")
+    @patch("app.jobs.service.db_get_job")
     def test_get_job_raises_403_for_non_owner(self, mock_db_get):
         """get_job raises 403 when the requesting user is not the owner."""
         mock_db_get.return_value = {
@@ -108,7 +108,7 @@ class TestGetJob:
 
         assert exc_info.value.status_code == 403
 
-    @patch("backend.app.jobs.service.db_get_job")
+    @patch("app.jobs.service.db_get_job")
     def test_get_job_raises_404_for_missing(self, mock_db_get):
         """get_job raises 404 when the job does not exist."""
         mock_db_get.return_value = None
@@ -122,7 +122,7 @@ class TestGetJob:
 class TestListUserJobs:
     """Tests for list_user_jobs function."""
 
-    @patch("backend.app.jobs.service.db_list_jobs_by_user")
+    @patch("app.jobs.service.db_list_jobs_by_user")
     def test_list_user_jobs_returns_paginated(self, mock_db_list):
         """list_user_jobs returns paginated results with metadata."""
         mock_db_list.return_value = {

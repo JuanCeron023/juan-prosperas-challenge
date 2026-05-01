@@ -6,7 +6,7 @@ from unittest.mock import patch
 import jwt
 import pytest
 
-from backend.app.auth.service import (
+from app.auth.service import (
     create_access_token,
     decode_token,
     hash_password,
@@ -48,7 +48,7 @@ class TestVerifyPassword:
 class TestCreateAccessToken:
     """Tests for create_access_token function."""
 
-    @patch("backend.app.auth.service.settings")
+    @patch("app.auth.service.settings")
     def test_create_access_token_returns_valid_jwt(self, mock_settings):
         """create_access_token returns a decodable JWT with correct claims."""
         mock_settings.jwt_secret = "test-secret"
@@ -66,7 +66,7 @@ class TestCreateAccessToken:
 class TestDecodeToken:
     """Tests for decode_token function."""
 
-    @patch("backend.app.auth.service.settings")
+    @patch("app.auth.service.settings")
     def test_decode_token_returns_payload(self, mock_settings):
         """decode_token returns the token payload for a valid token."""
         mock_settings.jwt_secret = "test-secret"
@@ -78,7 +78,7 @@ class TestDecodeToken:
         assert payload["sub"] == "user-456"
         assert payload["username"] == "anotheruser"
 
-    @patch("backend.app.auth.service.settings")
+    @patch("app.auth.service.settings")
     def test_decode_token_expired_raises(self, mock_settings):
         """decode_token raises InvalidTokenError for an expired token."""
         mock_settings.jwt_secret = "test-secret"
@@ -91,7 +91,7 @@ class TestDecodeToken:
         with pytest.raises(jwt.InvalidTokenError):
             decode_token(token)
 
-    @patch("backend.app.auth.service.settings")
+    @patch("app.auth.service.settings")
     def test_decode_token_invalid_raises(self, mock_settings):
         """decode_token raises InvalidTokenError for a tampered token."""
         mock_settings.jwt_secret = "test-secret"

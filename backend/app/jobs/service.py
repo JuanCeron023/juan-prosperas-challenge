@@ -5,14 +5,14 @@ import uuid
 
 from fastapi import HTTPException, status
 
-from backend.app.db.repository import (
+from app.db.repository import (
     create_job as db_create_job,
     get_job as db_get_job,
     list_jobs_by_user as db_list_jobs_by_user,
     update_job_status,
 )
-from backend.app.jobs.enums import JobStatus
-from backend.app.queue.publisher import publish_job_message
+from app.jobs.enums import JobStatus
+from app.queue.publisher import publish_job_message
 
 logger = logging.getLogger(__name__)
 
