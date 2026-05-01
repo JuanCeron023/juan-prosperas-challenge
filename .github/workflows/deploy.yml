@@ -21,11 +21,11 @@ jobs:
 
       - name: Install backend dependencies
         run: |
-          pip install -r backend/requirements.txt
-          pip install pytest pytest-asyncio moto[all] httpx
+          pip install -r backend/requirements-test.txt
 
       - name: Run backend tests
-        run: pytest backend/tests/ -v
+        run: pytest backend/tests/ -v --cov=backend/app --cov-report=term-missing
+        working-directory: backend
         env:
           AWS_DEFAULT_REGION: us-east-1
           AWS_ACCESS_KEY_ID: testing
@@ -38,7 +38,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: frontend
-        run: npm ci
+        run: npm install
 
       - name: Build frontend
         working-directory: frontend
