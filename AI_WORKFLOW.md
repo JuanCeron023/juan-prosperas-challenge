@@ -1,6 +1,6 @@
 # AI Workflow — Evidencia de Uso de Herramientas de IA
 
-## Resumen
+## Resumen 
 
 Este proyecto fue desarrollado con asistencia de herramientas de IA (Kiro — AI-powered development environment) siguiendo un flujo de trabajo spec-driven. La IA participó en todas las fases del desarrollo: diseño de arquitectura, generación de código, testing y documentación.
 
