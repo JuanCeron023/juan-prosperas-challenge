@@ -2,22 +2,47 @@
 
 import logging
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, HTTPException, Request, Query
 from fastapi.responses import StreamingResponse
 
-from app.auth.middleware import get_current_user
+from app.auth.service import decode_token
 from app.stream.service import job_status_stream
 
 router = APIRouter(prefix="/stream", tags=["stream"])
 logger = logging.getLogger(__name__)
 
 
+async def get_current_user_from_token(token: str) -> dict:
+    """Extract user info from JWT token (supports both header and query param)."""
+    try:
+        payload = decode_token(token)
+        user_id = payload.get("sub")
+        username = payload.get("username")
+        if not user_id:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid token: missing user ID",
+            )
+        return {"user_id": user_id, "username": username}
+    except Exception as e:
+        raise HTTPException(
+            status_code=401,
+            detail=f"Invalid token: {str(e)}",
+        )
+
+
 @router.get("/jobs")
 async def stream_jobs(
     request: Request,
-    current_user: dict = Depends(get_current_user),
+    token: str = Query(...),  # Token from query param (EventSource limitation)
 ):
-    """Stream job status updates via Server-Sent Events."""
+    """Stream job status updates via Server-Sent Events.
+
+    Note: EventSource doesn't support custom headers, so token must be
+    passed as query parameter: /stream/jobs?token=<jwt>
+    """
+    # Validate token and get user
+    current_user = await get_current_user_from_token(token)
     user_id = current_user["user_id"]
 
     async def event_generator():
