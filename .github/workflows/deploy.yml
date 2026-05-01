@@ -24,8 +24,8 @@ jobs:
           pip install -r backend/requirements-test.txt
 
       - name: Run backend tests
-        run: pytest backend/tests/ -v --cov=backend/app --cov-report=term-missing
         working-directory: backend
+        run: pytest tests/ -v
         env:
           AWS_DEFAULT_REGION: us-east-1
           AWS_ACCESS_KEY_ID: testing
