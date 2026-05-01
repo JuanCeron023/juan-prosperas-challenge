@@ -1,0 +1,117 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install backend dependencies
+        run: |
+          pip install -r backend/requirements.txt
+          pip install pytest pytest-asyncio moto[all] httpx
+
+      - name: Run backend tests
+        run: pytest backend/tests/ -v
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: testing
+          AWS_SECRET_ACCESS_KEY: testing
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+  deploy:
+    name: Deploy to AWS
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ec2-user/app
+
+            # Pull latest code
+            if [ -d ".git" ]; then
+              git pull origin main
+            else
+              git clone ${{ secrets.REPO_URL }} .
+            fi
+
+            # Create production .env
+            cat > .env << 'ENVEOF'
+            AWS_REGION=${{ env.AWS_REGION }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_EXPIRATION_MINUTES=60
+            DYNAMODB_JOBS_TABLE=${{ secrets.DYNAMODB_JOBS_TABLE }}
+            DYNAMODB_USERS_TABLE=${{ secrets.DYNAMODB_USERS_TABLE }}
+            SQS_STANDARD_QUEUE_URL=${{ secrets.SQS_STANDARD_QUEUE_URL }}
+            SQS_HIGH_QUEUE_URL=${{ secrets.SQS_HIGH_QUEUE_URL }}
+            WORKER_CONCURRENCY=2
+            WORKER_POLL_INTERVAL=1
+            WORKER_VISIBILITY_TIMEOUT=30
+            ENVEOF
+
+            # Create production docker-compose override (no LocalStack)
+            cat > docker-compose.prod.yml << 'COMPEOF'
+            version: "3.8"
+            services:
+              backend:
+                build:
+                  context: ./backend
+                ports:
+                  - "8000:8000"
+                env_file: .env
+                restart: always
+
+              worker:
+                build:
+                  context: ./worker
+                env_file: .env
+                restart: always
+
+              frontend:
+                build:
+                  context: ./frontend
+                ports:
+                  - "80:80"
+                depends_on:
+                  - backend
+                restart: always
+            COMPEOF
+
+            # Build and deploy
+            docker-compose -f docker-compose.prod.yml build
+            docker-compose -f docker-compose.prod.yml up -d
+
+            echo "Deployment complete!"
+            echo "Application URL: http://$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)"

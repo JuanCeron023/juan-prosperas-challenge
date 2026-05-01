@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  localstack:
+    image: localstack/localstack:3.0
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sqs,dynamodb
+      - DEFAULT_REGION=us-east-1
+    volumes:
+      - ./infra/localstack/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - AWS_REGION=us-east-1
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - JWT_SECRET=${JWT_SECRET:-super-secret-dev-key}
+      - JWT_EXPIRATION_MINUTES=60
+      - DYNAMODB_JOBS_TABLE=jobs
+      - DYNAMODB_USERS_TABLE=users
+      - SQS_STANDARD_QUEUE_URL=http://localstack:4566/000000000000/reports-queue-standard
+      - SQS_HIGH_QUEUE_URL=http://localstack:4566/000000000000/reports-queue-high
+    depends_on:
+      localstack:
+        condition: service_healthy
+    restart: on-failure
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    environment:
+      - AWS_REGION=us-east-1
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - DYNAMODB_JOBS_TABLE=jobs
+      - SQS_STANDARD_QUEUE_URL=http://localstack:4566/000000000000/reports-queue-standard
+      - SQS_HIGH_QUEUE_URL=http://localstack:4566/000000000000/reports-queue-high
+      - WORKER_CONCURRENCY=2
+      - WORKER_POLL_INTERVAL=1
+      - WORKER_VISIBILITY_TIMEOUT=30
+    depends_on:
+      localstack:
+        condition: service_healthy
+    restart: on-failure
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
