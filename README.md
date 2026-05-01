@@ -1,6 +1,6 @@
 # Sistema de Procesamiento Asíncrono de Reportes
 
-[![Deploy to AWS](https://github.com/<OWNER>/<REPO>/actions/workflows/deploy.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/deploy.yml)
+[![Deploy to AWS](https://github.com/JuanCeron023/juan-prosperas-challenge/actions/workflows/deploy.yml/badge.svg)](https://github.com/JuanCeron023/juan-prosperas-challenge/actions/workflows/deploy.yml)
 
 Sistema completo de procesamiento asíncrono de reportes para una plataforma SaaS de analítica. Los usuarios solicitan reportes bajo demanda que se procesan en segundo plano mediante una arquitectura basada en colas de mensajes (AWS SQS) y workers concurrentes, con persistencia en AWS DynamoDB.
 
