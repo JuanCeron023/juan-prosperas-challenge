@@ -3,8 +3,8 @@
 from datetime import datetime, timezone
 from typing import Any
 
-from worker.app.config import settings
-from worker.app.db.client import get_dynamodb_table
+from app.config import settings
+from app.db.client import get_dynamodb_table
 
 
 def _get_jobs_table():

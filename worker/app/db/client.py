@@ -2,7 +2,7 @@
 
 import boto3
 from functools import lru_cache
-from worker.app.config import settings
+from app.config import settings
 
 
 @lru_cache(maxsize=1)

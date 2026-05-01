@@ -10,10 +10,10 @@ import logging
 
 import boto3
 
-from worker.app.circuit_breaker import CircuitBreaker
-from worker.app.config import settings
-from worker.app.db.repository import update_job_status
-from worker.app.retry import retry_with_backoff
+from app.circuit_breaker import CircuitBreaker
+from app.config import settings
+from app.db.repository import update_job_status
+from app.retry import retry_with_backoff
 
 logger = logging.getLogger(__name__)
 

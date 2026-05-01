@@ -9,7 +9,7 @@ import logging
 import random
 import uuid
 
-from worker.app.db.repository import update_job_status
+from app.db.repository import update_job_status
 
 logger = logging.getLogger(__name__)
 

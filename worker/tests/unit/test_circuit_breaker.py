@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from worker.app.circuit_breaker import CircuitBreaker
+from app.circuit_breaker import CircuitBreaker
 
 
 class TestCircuitBreakerClosed:

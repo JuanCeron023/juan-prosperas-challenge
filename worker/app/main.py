@@ -7,8 +7,8 @@ import asyncio
 import logging
 import signal
 
-from worker.app.consumer import consume_loop
-from worker.app.processor import process_report
+from app.consumer import consume_loop
+from app.processor import process_report
 
 logging.basicConfig(
     level=logging.INFO,

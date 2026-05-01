@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from worker.app.retry import retry_with_backoff
+from app.retry import retry_with_backoff
 
 
 class TestRetryWithBackoffSuccess:
@@ -21,7 +21,7 @@ class TestRetryWithBackoffSuccess:
     @pytest.mark.asyncio
     async def test_returns_result_after_retries(self):
         func = AsyncMock(side_effect=[Exception("fail"), Exception("fail"), "success"])
-        with patch("worker.app.retry.asyncio.sleep", new_callable=AsyncMock):
+        with patch("app.retry.asyncio.sleep", new_callable=AsyncMock):
             result = await retry_with_backoff(func, "arg1", job_id="job-1")
         assert result == "success"
         assert func.call_count == 3
@@ -39,7 +39,7 @@ class TestRetryWithBackoffFailure:
     @pytest.mark.asyncio
     async def test_raises_last_exception_after_max_retries(self):
         func = AsyncMock(side_effect=ValueError("persistent error"))
-        with patch("worker.app.retry.asyncio.sleep", new_callable=AsyncMock):
+        with patch("app.retry.asyncio.sleep", new_callable=AsyncMock):
             with pytest.raises(ValueError, match="persistent error"):
                 await retry_with_backoff(func, job_id="job-1")
         assert func.call_count == 3
@@ -47,7 +47,7 @@ class TestRetryWithBackoffFailure:
     @pytest.mark.asyncio
     async def test_custom_max_retries(self):
         func = AsyncMock(side_effect=RuntimeError("fail"))
-        with patch("worker.app.retry.asyncio.sleep", new_callable=AsyncMock):
+        with patch("app.retry.asyncio.sleep", new_callable=AsyncMock):
             with pytest.raises(RuntimeError):
                 await retry_with_backoff(func, max_retries=5, job_id="job-1")
         assert func.call_count == 5
@@ -64,8 +64,8 @@ class TestRetryWithBackoffDelays:
         async def mock_sleep(delay):
             sleep_calls.append(delay)
 
-        with patch("worker.app.retry.asyncio.sleep", side_effect=mock_sleep):
-            with patch("worker.app.retry.random.uniform", return_value=0.0):
+        with patch("app.retry.asyncio.sleep", side_effect=mock_sleep):
+            with patch("app.retry.random.uniform", return_value=0.0):
                 await retry_with_backoff(func, job_id="job-1")
 
         # With 0 jitter: delays should be exactly 1s, 2s
@@ -81,7 +81,7 @@ class TestRetryWithBackoffDelays:
         async def mock_sleep(delay):
             sleep_calls.append(delay)
 
-        with patch("worker.app.retry.asyncio.sleep", side_effect=mock_sleep):
+        with patch("app.retry.asyncio.sleep", side_effect=mock_sleep):
             await retry_with_backoff(func, job_id="job-1", base_delay=1.0, jitter_ms=500)
 
         # Delay should be 1.0 ± 0.5 → [0.5, 1.5]
@@ -96,7 +96,7 @@ class TestRetryWithBackoffDelays:
         async def mock_sleep(delay):
             sleep_calls.append(delay)
 
-        with patch("worker.app.retry.asyncio.sleep", side_effect=mock_sleep):
+        with patch("app.retry.asyncio.sleep", side_effect=mock_sleep):
             with pytest.raises(Exception):
                 await retry_with_backoff(func, max_retries=3, job_id="job-1")
 
@@ -111,8 +111,8 @@ class TestRetryWithBackoffLogging:
     async def test_logs_each_retry_attempt(self):
         func = AsyncMock(side_effect=[Exception("e1"), Exception("e2"), "ok"])
 
-        with patch("worker.app.retry.asyncio.sleep", new_callable=AsyncMock):
-            with patch("worker.app.retry.logger") as mock_logger:
+        with patch("app.retry.asyncio.sleep", new_callable=AsyncMock):
+            with patch("app.retry.logger") as mock_logger:
                 await retry_with_backoff(func, job_id="test-job")
 
         # Should log 2 retry attempts (attempt 1 and 2, then success on 3)
